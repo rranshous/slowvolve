@@ -1,0 +1,9 @@
+Raw Source of data, dna
+
+chromospomes are defined via pattern matching
+
+all "choices" made by mutator, breeder and actor are expressions of chromosomes
+
+actor has two levels:
+ 1) dicisionless / nonvariable behavior / noise
+ 2) applied choices / decided behavior / suppression
