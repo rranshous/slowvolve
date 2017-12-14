@@ -72,7 +72,6 @@ class Community
     sim.remove_individuals dying
     remaining_population_size = sim.individuals.length
     to_kill = [remaining_population_size - target_size, 0].max
-    puts "to_kill: #{to_kill}"
     individuals_by_fitness(sim).take(to_kill)
       .each { |i| sim.remove_individual i }
   end

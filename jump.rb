@@ -2,20 +2,23 @@ require_relative 'lib'
 
 
 class PatternCountChromosome
+  attr_accessor :pattern
+
+  def initialize pattern
+    self.pattern = pattern
+  end
+
   def express genome
     # returns the # of times that the genome contains the pattern
     genome.each_cons(pattern.length).select { |els| els == pattern }.length
-  end
-
-  def pattern
-    [1, 1, 0]
   end
 end
 
 class FitnessChecker
 
   def fitness_of individual
-    (5 - PatternCountChromosome.new.express(individual.genome)).abs
+    # find a genome w/ 5 occurencees of the pattern
+    (5 - PatternCountChromosome.new([1,1,0]).express(individual.genome)).abs
   end
 
 
