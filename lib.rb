@@ -130,8 +130,8 @@ class Sim
     puts "Running: #{community_size}x#{generations}"
     community.target_size = community_size
     generations.times do |i|
-      puts "GENERATION: #{i}"
       community.run_generation self
+      yield(i, self, community) if block_given?
       return community.most_fit(self) if done?
     end
     community.most_fit(self)
@@ -139,6 +139,10 @@ class Sim
 
   def done?
     max_fitness_achieved?
+  end
+
+  def most_fit community
+    community.most_fit self
   end
 
   def add_individuals individuals

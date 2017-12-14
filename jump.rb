@@ -1,54 +1,56 @@
 require_relative 'lib'
 
 
-class PatternCountChromosome
-  attr_accessor :pattern
+class PatternChromosome
+  attr_accessor :pattern, :count
 
-  def initialize pattern
+  def initialize pattern, count=1
     self.pattern = pattern
-  end
-
-  def express genome
-    # returns the # of times that the genome contains the pattern
-    genome.each_cons(pattern.length).select { |els| els == pattern }.length
-  end
-end
-
-class CompoundFitnessChecker
-  attr_accessor :fitness_checkers
-
-  def initialize *fitness_checkers
-    self.fitness_checkers = fitness_checkers
-  end
-
-  def fitness_of individual
-    self.fitness_checkers.reduce(0) { |sum, fit| sum + fit.fitness_of(individual) }
-  end
-end
-
-class PatternFitnessChecker
-  attr_accessor :chromosome, :count, :pattern
-
-  def initialize pattern, count=5
     self.count = count
-    self.pattern = pattern
-    self.chromosome = PatternCountChromosome.new pattern
+  end
+
+  def distance genome
+    return 0 if find_occurances(genome).length >= 1
+    genome.each_cons(pattern.length).map do |els|
+      pattern.zip(els).reduce(0) { |sum, (p,e)| sum += (p == e ? 0: 1) }
+    end.reduce(0, :+)
+  end
+
+  private
+
+  def find_occurances genome
+    genome.each_cons(pattern.length).select { |els| els == pattern }
+  end
+end
+
+class ChromosomeFitnessChecker
+  attr_accessor :chromosomes
+
+  def initialize *chromosomes
+    self.chromosomes = chromosomes
   end
 
   def fitness_of individual
-    # find a genome w/ 5 occurencees of the pattern
-    (count - chromosome.express(individual.genome)).abs
+    self.chromosomes.reduce(0) do |sum, chromosome|
+      sum += chromosome.distance(individual.genome)
+    end
   end
 end
 
 if __FILE__ == $0
   require 'pry'
+
+  patterns = [
+    [1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0,
+     1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0]
+  ]
+  patterns = [[ 1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,0,1,1,0 ]]
   puts "running sim"
-  sim = Sim.new CompoundFitnessChecker.new(
-    PatternFitnessChecker.new([1,1,1]),
-    PatternFitnessChecker.new([0,0,0]),
-    PatternFitnessChecker.new([0,0,0,1,1,0,1])
-  )
-  results = sim.run! generations: 1000, community_size: 1000
+  chromosomes = patterns.map { |p| PatternChromosome.new(p) }
+  sim = Sim.new(ChromosomeFitnessChecker.new(*chromosomes))
+  results = sim.run!(generations: 1000, community_size: 1000) do |generation, sim, community|
+    best = sim.most_fit(community)
+    puts "G#{generation}] #{best.fitness} :: #{best.genome}"
+  end
   puts "results: #{results.fitness} :: #{results.genome}"
 end
