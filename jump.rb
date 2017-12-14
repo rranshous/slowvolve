@@ -16,6 +16,7 @@ class Individual
   attr_accessor :genome, :fitness, :age
 
   def initialize genome
+    raise "wtf?! #{genome.length}" if genome.length != GENOME_LENGTH
     self.genome = genome
     self.age = 0
   end
@@ -28,8 +29,7 @@ class Individual
     # TODO: make gene based choice for crossover % (?)
     crossover_percent = rand(1..9).to_f * 0.1
     crossover_index = (crossover_percent * genome.length).to_i
-    puts "crossover_index: #{crossover_index}"
-    new_genome = genome[0..crossover_index].zip(other.genome).map { |g1, g2|  [g1, g2].sample }
+    new_genome = genome[0...crossover_index].zip(other.genome).map { |g1, g2|  [g1, g2].sample }
     new_genome += genome[crossover_index..-1]
     new_genome = mutate(new_genome)
     self.class.new new_genome
@@ -52,20 +52,16 @@ class Individual
 end
 
 class Community
-  MAX_AGE = 3
+  MAX_AGE = 3 # TODO: base on genome?
 
   attr_accessor :fitness_checker
 
   def run_generation sim
     cull sim
     age sim
-    puts "culled: #{sim.individuals.length}"
     breed sim
-    puts "breed: #{sim.individuals.length}"
     fill_out sim
-    puts "fill out: #{sim.individuals.length}"
     compute_fitnesses sim
-    puts "computed fitnesses: #{sim.individuals.length}"
   end
 
   def compute_fitnesses sim
