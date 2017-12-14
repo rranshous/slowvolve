@@ -49,9 +49,9 @@ class Individual
 end
 
 class Community
-  MAX_AGE = 3 # TODO: base on genome?
+  MAX_AGE = 3
 
-  attr_accessor :fitness_checker
+  attr_accessor :fitness_checker, :target_size
 
   def run_generation sim
     cull sim
@@ -102,10 +102,6 @@ class Community
     sim.individuals.sort_by(&:fitness).first
   end
 
-  def target_size
-    100
-  end
-
   def individuals_by_fitness sim
     sim.individuals.sort_by(&:fitness)
   end
@@ -130,7 +126,9 @@ class Sim
     self.individuals = []
   end
 
-  def run! generations
+  def run! generations: 100, community_size: 100
+    puts "Running: #{community_size}x#{generations}"
+    community.target_size = community_size
     generations.times do |i|
       puts "GENERATION: #{i}"
       community.run_generation self
