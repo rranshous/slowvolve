@@ -6,8 +6,9 @@ class Individual
   end
 
   def self.random_genome len
-    choices = [0, 1]
-    Array.new(len) { choices.sample }
+    #choices = [0, 1]
+    #Array.new(len) { choices.sample }
+    Array.new(len) { rand }.map {|v| rand(0..1)==1 ? -(v) : v }
   end
 
   attr_accessor :genome, :fitness, :age
@@ -39,7 +40,8 @@ class Individual
   private
 
   def flip g
-    g == 0 ? 1 : 0
+    #g == 0 ? 1 : 0
+    -(g)
   end
 
   def random_mutate?
