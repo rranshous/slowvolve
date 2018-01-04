@@ -11,16 +11,11 @@ class Individual
     Array.new(len) { rand }.map {|v| rand(0..1)==1 ? -(v) : v }
   end
 
-  attr_accessor :genome, :fitness, :age
+  attr_accessor :genome, :fitness
 
   def initialize genome
     raise "wtf?! #{genome.length}" if genome.length != GENOME_LENGTH
     self.genome = genome
-    self.age = 0
-  end
-
-  def get_older
-    self.age += 1
   end
 
   def + other
@@ -51,13 +46,10 @@ class Individual
 end
 
 class Community
-  MAX_AGE = 3
-
   attr_accessor :fitness_checker, :target_size
 
   def run_generation sim
     cull sim
-    age sim
     breed sim
     fill_out sim
     compute_fitnesses sim
@@ -70,16 +62,9 @@ class Community
   end
 
   def cull sim
-    dying = sim.individuals.select { |i| i.age > MAX_AGE }
-    sim.remove_individuals dying
-    remaining_population_size = sim.individuals.length
-    to_kill = [remaining_population_size - target_size, 0].max
-    individuals_by_fitness(sim).take(to_kill)
+    to_kill = target_size * 0.5
+    individuals_by_fitness(sim).reverse.take(to_kill)
       .each { |i| sim.remove_individual i }
-  end
-
-  def age sim
-    sim.individuals.each(&:get_older)
   end
 
   def breed sim
@@ -89,7 +74,7 @@ class Community
 
   def fill_out sim
     to_create = target_size - sim.individuals.length
-    to_create.times { |i| sim.add_individual random_individual }
+    sim.add_individuals(Array.new(to_create) { random_individual })
   end
 
   def random_individual
