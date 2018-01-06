@@ -4,7 +4,7 @@ require_relative 'neural_net'
 
 class BrainFitnessChecker
 
-  attr_accessor :layers, :target_genome_length
+  attr_accessor :layers, :input_layer_size, :output_layer_size
 
   def initialize
     # first layer has N neurons
@@ -18,13 +18,9 @@ class BrainFitnessChecker
     # pick a brain setup and than make the length of the genome
     #  to fit the layer size ?
     # grow a genome which is too long ?
-    self.layers = [
-      3,
-      5,
-      2
-    ]
-    self.target_genome_length = calc_target_genome_length
-    puts "target genome length: #{self.target_genome_length}"
+    # cycle through genome filling in weights until layers are filled?
+    self.input_layer_size = 3
+    self.output_layer_size = 2
   end
 
   def fitness_of individual
@@ -47,25 +43,31 @@ class BrainFitnessChecker
   def create_from individual
     genome = individual.genome.dup
     weights = {}
-    self.layers[1..-1].each_with_index do |layer_size, i|
+    hidden_layer_size = hidden_layer_size_for individual
+    if hidden_layer_size == 0
+      layers =  [input_layer_size, output_layer_size]
+    else
+      layers =  [input_layer_size, hidden_layer_size, output_layer_size]
+    end
+    pointer = 0
+    layers[1..-1].each_with_index do |layer_size, i|
       weights[i+1] = []
-      (layer_size).times do
-        weights[i+1] << genome.shift(self.layers[i])
+      (layer_size+1).times do
+        weights[i+1] << Array.new(layers[i]) {
+          weight = genome[pointer]
+          pointer += 1
+          pointer = pointer % genome.length
+          weight
+        }
       end
     end
-    nn = NeuralNet.new self.layers
+    nn = NeuralNet.new layers
     nn.weights = weights
     nn
   end
 
-  def calc_target_genome_length
-    neurons = 0
-    previous_layer_size = layers[0]
-    layers[1..-1].each do |layer_size|
-      neurons += (previous_layer_size + 1) * layer_size
-      previous_layer_size = layer_size
-    end
-    neurons
+  def hidden_layer_size_for individual
+    individual.genome.reduce(:+).round.abs
   end
 end
 
@@ -74,10 +76,10 @@ if __FILE__ == $0
   puts "running sim"
   fitness_checker = BrainFitnessChecker.new
   s = Sim.new(fitness_checker)
-  Individual::GENOME_LENGTH = fitness_checker.target_genome_length
   results = s.run!(generations: 100, community_size: 1000) do |gen, sim, comm|
     best = sim.most_fit(comm)
-    puts "G#{gen}] #{best.fitness} :: #{best.genome}"
+    hidden_size = fitness_checker.hidden_layer_size_for best
+    puts "G#{gen}] [#{hidden_size}] #{best.fitness} :: #{best.genome}"
   end
   puts "results: #{results.fitness} :: #{results.genome}"
 end
