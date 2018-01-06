@@ -75,11 +75,14 @@ if __FILE__ == $0
   require 'pry'
   puts "running sim"
   fitness_checker = BrainFitnessChecker.new
+  Individual::GENOME_LENGTH = 200
   s = Sim.new(fitness_checker)
-  results = s.run!(generations: 100, community_size: 1000) do |gen, sim, comm|
+  gens, size = 1000, 300
+  best = s.run!(generations: gens, community_size: size) do |gen, sim, comm|
     best = sim.most_fit(comm)
     hidden_size = fitness_checker.hidden_layer_size_for best
-    puts "G#{gen}] [#{hidden_size}] #{best.fitness} :: #{best.genome}"
+    puts "G#{gen}/#{gens}@#{size}] [#{hidden_size}] #{best.fitness} :: #{best.genome}"
   end
-  puts "results: #{results.fitness} :: #{results.genome}"
+  puts "results:"
+  puts "G#{gen}/#{gens}@#{size}] [#{hidden_size}] #{best.fitness} :: #{best.genome}"
 end
