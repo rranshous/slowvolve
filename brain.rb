@@ -73,9 +73,9 @@ if __FILE__ == $0
   require 'pry'
   puts "running sim"
   fitness_checker = BrainFitnessChecker.new
-  sim = Sim.new(fitness_checker)
+  s = Sim.new(fitness_checker)
   Individual::GENOME_LENGTH = fitness_checker.target_genome_length
-  results = sim.run!(generations: 100, community_size: 1000) do |gen, sim, comm|
+  results = s.run!(generations: 100, community_size: 1000) do |gen, sim, comm|
     best = sim.most_fit(comm)
     puts "G#{gen}] #{best.fitness} :: #{best.genome}"
   end

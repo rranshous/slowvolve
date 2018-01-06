@@ -29,10 +29,14 @@ class Individual
   end
 
   def mutate genome
-    genome.map { |g| random_mutate? ? flip(g) : g }
+    genome.map { |g| random_mutate? ? nudge(g) : g }
   end
 
   private
+
+  def nudge g
+    [g + 0.1, g - 0.1].sample
+  end
 
   def flip g
     #g == 0 ? 1 : 0
