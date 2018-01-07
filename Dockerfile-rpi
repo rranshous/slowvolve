@@ -1,0 +1,9 @@
+FROM hypriot/rpi-ruby:2.2.2
+
+ADD ./ /app
+WORKDIR /app
+
+RUN bundle install
+
+ENTRYPOINT ["bundle", "exec", "ruby", "brain.rb"]
+CMD ["1000", "5000"]
