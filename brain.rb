@@ -78,6 +78,7 @@ if __FILE__ == $0
   puts "VERSION: self defining hidden layer, variable len starter genes, mutate can remove gene, genome length in fitness test"
   fitness_checker = BrainFitnessChecker.new
   Individual::VariableGeneLength = true
+  Individual::GENOME_LENGTH = 200
   s = Sim.new(fitness_checker)
   gens = (ARGV.shift || 200).to_i
   size = (ARGV.shift || 500).to_i
