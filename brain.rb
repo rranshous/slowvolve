@@ -77,13 +77,16 @@ if __FILE__ == $0
   fitness_checker = BrainFitnessChecker.new
   Individual::GENOME_LENGTH = 200
   s = Sim.new(fitness_checker)
-  gens, size = 200, 500
+  gens = (ARGV.shift || 200).to_i
+  size = (ARGV.shift || 500).to_i
   best = s.run!(generations: gens, community_size: size) do |gen, sim, comm|
     best = sim.most_fit(comm)
     hidden_size = fitness_checker.hidden_layer_size_for best
-    puts "G#{gen}/#{gens}@#{size}] [#{hidden_size}] #{best.fitness} :: #{best.genome}"
+    puts "G#{gen}/#{gens}@#{size}] [#{hidden_size}] #{best.fitness} - #{Individual::GENOME_LENGTH}"
+    STDOUT.flush
   end
   puts "results:"
   hidden_size = fitness_checker.hidden_layer_size_for best
-  puts "#{gens}@#{size}] [#{hidden_size}] #{best.fitness} :: #{best.genome}"
+  puts "#{gens}@#{size}] [#{hidden_size}] #{best.fitness} - #{Individual::GENOME_LENGTH} :: #{best.genome}"
+  STDOUT.flush
 end

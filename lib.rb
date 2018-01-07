@@ -118,7 +118,7 @@ class Sim
   end
 
   def run! generations: 100, community_size: 100
-    puts "Running: #{community_size}x#{generations}"
+    puts "Running: #{generations}@#{community_size}"
     community.target_size = community_size
     generations.times do |i|
       community.run_generation self
