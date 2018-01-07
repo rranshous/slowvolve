@@ -37,6 +37,7 @@ class BrainFitnessChecker
       score += 1 if mostly_high_guess != actually_mostly_high
       score += 1 if mostly_low_guess  != actually_mostly_low
     end
+    score += individual.genome.length * 0.1
     score
   end
 
@@ -74,19 +75,20 @@ end
 if __FILE__ == $0
   require 'pry'
   puts "running sim"
+  puts "VERSION: self defining hidden layer, variable len starter genes, mutate can remove gene, genome length in fitness test"
   fitness_checker = BrainFitnessChecker.new
-  Individual::GENOME_LENGTH = 200
+  Individual::VariableGeneLength = true
   s = Sim.new(fitness_checker)
   gens = (ARGV.shift || 200).to_i
   size = (ARGV.shift || 500).to_i
   best = s.run!(generations: gens, community_size: size) do |gen, sim, comm|
     best = sim.most_fit(comm)
     hidden_size = fitness_checker.hidden_layer_size_for best
-    puts "G#{gen}/#{gens}@#{size}] [#{hidden_size}] #{best.fitness} - #{Individual::GENOME_LENGTH}"
+    puts "G#{gen}/#{gens}@#{size}]\tHL#{hidden_size} F#{best.fitness}\tG#{best.genome.length}"
     STDOUT.flush
   end
   puts "results:"
   hidden_size = fitness_checker.hidden_layer_size_for best
-  puts "#{gens}@#{size}] [#{hidden_size}] #{best.fitness} - #{Individual::GENOME_LENGTH} :: #{best.genome}"
+  puts "G#{gens}@#{size}]\tHL#{hidden_size} F#{best.fitness}\tG#{best.genome.length}"
   STDOUT.flush
 end

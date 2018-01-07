@@ -1,5 +1,6 @@
 class Individual
   GENOME_LENGTH = 100
+  VariableGeneLength = false
 
   def self.new_random
     new random_genome(GENOME_LENGTH)
@@ -8,13 +9,14 @@ class Individual
   def self.random_genome len
     #choices = [0, 1]
     #Array.new(len) { choices.sample }
+    variance = len * 0.5
+    len += rand(-variance..variance) if VariableGeneLength
     Array.new(len) { rand }.map {|v| rand(0..1)==1 ? -(v) : v }
   end
 
   attr_accessor :genome, :fitness
 
   def initialize genome
-    raise "wtf?! #{genome.length}" if genome.length != GENOME_LENGTH
     self.genome = genome
   end
 
@@ -22,13 +24,14 @@ class Individual
     # TODO: make gene based choice for crossover % (?)
     crossover_percent = rand(1..9).to_f * 0.1
     crossover_index = (crossover_percent * genome.length).to_i
-    new_genome = genome[0...crossover_index].zip(other.genome).map { |g1, g2|  [g1, g2].sample }
+    new_genome = genome[0...crossover_index].zip(other.genome).map { |g1, g2|  [g1, g2].sample }.compact
     new_genome += genome[crossover_index..-1]
     new_genome = mutate(new_genome)
     self.class.new new_genome
   end
 
   def mutate genome
+    genome.pop if VariableGeneLength && random_mutate?
     genome.map { |g| random_mutate? ? nudge(g) : g }
   end
 
