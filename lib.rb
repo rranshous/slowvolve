@@ -165,7 +165,7 @@ end
 class BrainFactory
   attr_accessor :input_layer_size, :output_layer_size
 
-  def initialize
+  def initialize input_layer_size: 3, output_layer_size: 2
     # first layer has N neurons
     # next layer has M neurons
     # each of the M neurons will have N + 1 weights
@@ -175,8 +175,8 @@ class BrainFactory
     # than 7 neurons w/ 4 conns each = 28 weights
     #
     # define just the top and bottom, hidden layer is self defining from genome
-    self.input_layer_size = 3
-    self.output_layer_size = 2
+    self.input_layer_size = input_layer_size
+    self.output_layer_size = output_layer_size
   end
 
   def create_from individual
