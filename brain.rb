@@ -4,7 +4,7 @@ require_relative 'brain/lib'
 require 'json'
 
 module Brain::FitnessChecker
-  class Blah
+  class RedFinder
     # turn on when most the input fits a pattern
     # is the image mostly red ?
     attr_accessor :factory
@@ -14,10 +14,18 @@ module Brain::FitnessChecker
                                       output_layer_size: 2
     end
 
+    def best_possible? individual
+      individual.fitness <= length_penalty(individual)
+    end
+
+    def length_penalty individual
+      individual.genome.length * 0.1
+    end
+
     def fitness_of individual
       score = 0
-      100.times do
-        brain = factory.create_from individual
+      brain = factory.create_from individual
+      1000.times do
         image_details = generate_random_image
         mostly_red, mostly_not_red = brain.run image_details.data
         mostly_red = mostly_red >= 0.5
@@ -26,7 +34,8 @@ module Brain::FitnessChecker
         score += 1 if mostly_not_red == image_details.is_red
         score += 2 if mostly_red == mostly_not_red
       end
-      score += individual.genome.length * 0.1
+      score += length_penalty(individual)
+      puts "score: #{score}"
       score
     end
 
@@ -54,7 +63,7 @@ if __FILE__ == $0
   require 'pry'
   puts "running sim"
   puts "VERSION: self defining hidden layer, variable len starter genes, mutate can remove gene, genome length in fitness test"
-  fitness_checker = Brain::FitnessChecker::HighOrLow.new
+  fitness_checker = Brain::FitnessChecker::RedFinder.new
   Individual::VariableGeneLength = true
   Individual::GENOME_LENGTH = 200
   puts "base GENOME_LENGTH: #{Individual::GENOME_LENGTH}"

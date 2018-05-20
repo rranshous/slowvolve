@@ -58,6 +58,7 @@ class Community
   attr_accessor :fitness_checker, :target_size
 
   def run_generation sim
+    puts "pop size: #{sim.individuals.size}"
     cull sim
     breed sim
     fill_out sim
@@ -71,18 +72,26 @@ class Community
   end
 
   def cull sim
-    to_kill = target_size * 0.5
+    to_kill = sim.individuals.size * 0.8
+    puts "killing: #{to_kill}"
     individuals_by_fitness(sim).reverse.take(to_kill)
       .each { |i| sim.remove_individual i }
   end
 
   def breed sim
-    new_individuals = top_pairs(sim).map { |i1, i2| i1 + i2 }
+    return if sim.individuals.length == 0
+    to_birth = (target_size - sim.individuals.length) * 0.8
+    new_individuals = []
+    while new_individuals.length < to_birth
+      new_individuals += top_pairs(sim).map { |i1, i2| i1 + i2 }
+    end
+    puts "birthed: #{new_individuals.length}"
     sim.add_individuals new_individuals
   end
 
   def fill_out sim
     to_create = target_size - sim.individuals.length
+    puts "creating: #{to_create}"
     sim.add_individuals(Array.new(to_create) { random_individual })
   end
 
@@ -105,10 +114,8 @@ class Community
   private
 
   def top_pairs sim
-    breed_count = sim.individuals.length * 0.2 # take top 20%
     sim.individuals
       .sort_by(&:fitness)
-      .take(breed_count)
       .each_cons(2)
   end
 end
@@ -158,7 +165,13 @@ class Sim
   end
 
   def max_fitness_achieved?
-    individuals.detect { |i| i.fitness == 0 } ? true : false
+    individuals.detect do |i|
+      fitness_checker.best_possible?(i)
+    end
+  end
+
+  def fitness_checker
+    community.fitness_checker
   end
 end
 
