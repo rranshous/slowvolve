@@ -33,7 +33,7 @@ module Brain::FitnessChecker
         score += 2 if mostly_red == mostly_not_red
       end
       score += length_penalty(individual)
-      puts "score: #{score}"
+      puts "score [L#{individual.genome.size}]: #{score}"
       score
     end
 

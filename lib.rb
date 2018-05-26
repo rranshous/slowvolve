@@ -1,7 +1,7 @@
 require_relative 'neural_net'
 require 'parallel'
 
-GENOME_LENGTH = 100
+GENOME_LENGTH = 1000
 
 class Individual
   VariableGeneLength = false
@@ -92,7 +92,6 @@ class Community
     to_birth = ((target_size - sim.individuals.length) * 0.8).to_i
     new_individuals = []
     while new_individuals.length < to_birth
-      puts "new individuals [#{new_individuals.length}/#{to_birth}]"
       new_individuals += top_pairs(sim).map { |i1, i2| i1 + i2 }
     end
     puts "birthed: #{new_individuals.length}"
