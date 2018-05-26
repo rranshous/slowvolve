@@ -36,7 +36,6 @@ module Brain
           puts "Ex: #{ex}"
         end
       end
-      puts
     end
 
     class Image

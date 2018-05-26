@@ -1,5 +1,6 @@
 require_relative 'image_collection'
-require_relative 'pixel_reader'
+require_relative 'red_finder_fitness_checker'
+
 module Brain
 
   module FitnessChecker
