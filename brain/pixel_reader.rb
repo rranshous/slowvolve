@@ -1,3 +1,7 @@
+require 'json'
+require 'bson'
+require 'oj'
+
 module Brain
   class PixelReader
 
@@ -8,6 +12,7 @@ module Brain
     end
 
     def rgb
+      # rgb_from_bson || # BSON NOT WORKING!!!
       rgb_from_json ||
         rgb_from_text
     end
@@ -25,8 +30,12 @@ module Brain
 
     def rgb_from_json
       return false unless json_version_exists?
-      print '.'
-      JSON.parse(File.open(image_path+'.json', 'r').read)
+      Oj.load(File.open(image_path+'.json', 'r').read)
+    end
+
+    def rgb_from_bson
+      return false unless bson_version_exists?
+      Array.from_bson(File.open(image_path+'.bson', 'rb').read)
     end
 
     def text_version_exists?
@@ -35,6 +44,10 @@ module Brain
 
     def json_version_exists?
       File.exists?(image_path+'.json')
+    end
+
+    def bson_version_exists?
+      File.exists?(image_path+'.bson')
     end
 
     def image_path
@@ -53,7 +66,14 @@ module Brain
     def write_as_json
       rgb_data = image.rgb
       File.open(image_path+'.json', 'w') do |fh|
-        fh.write(rgb_data)
+        fh.write(Oj.dump(rgb_data))
+      end
+    end
+
+    def write_as_bson
+      rgb_data = image.rgb
+      File.open(image_path+'.bson', 'wb') do |fh|
+        fh.write(rgb_data.to_bson)
       end
     end
 
@@ -63,6 +83,19 @@ module Brain
 
     def image_rgb
       image.rgb
+    end
+
+    # TODO: not repeat
+    def text_version_exists?
+      File.exists?(image_path+'.txt')
+    end
+
+    def json_version_exists?
+      File.exists?(image_path+'.json')
+    end
+
+    def bson_version_exists?
+      File.exists?(image_path+'.bson')
     end
   end
 end
