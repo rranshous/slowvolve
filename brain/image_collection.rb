@@ -22,23 +22,27 @@ module Brain
       puts "found images: #{image_paths.size}"
       image_paths.each do |image_path|
         begin
-          reader = PixelReader.new(image_path: image_path)
-          image = Image.new
-          image.rgb = reader.rgb
-          image.path = image_path
-          print '.'
+          image = Image.new path: image_path
           @image_sets[type] << image
-        rescue SignalException
-          raise
-        rescue Exception => ex
-          puts "Ex: #{ex}"
         end
       end
-      puts
     end
 
+    def all type: :ALL
+      if type == :ALL
+        @image_sets.values.flatten
+      else
+        @image_sets[type]
+      end
+    end
+
+    # TODO: move out from under ImageCollection
     class Image
-      attr_accessor :rgb, :path
+      attr_accessor :path
+
+      def initialize path: nil
+        self.path = path
+      end
 
       def rgb_flat
         rgb.flatten
@@ -50,6 +54,14 @@ module Brain
 
       def to_s
         inspect
+      end
+
+      def rgb
+        @rgb ||= pixel_reader.rgb
+      end
+
+      def pixel_reader
+        @pixel_reader ||= Brain::PixelReader.new image: self
       end
     end
   end

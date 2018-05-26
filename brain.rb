@@ -3,10 +3,11 @@ require_relative 'lib'
 require_relative 'brain/lib'
 require 'json'
 
+puts "VERSION: self defining hidden layer, variable len starter genes, mutate can remove gene, genome length in fitness test, red images, real images as input"
+
 if __FILE__ == $0
   require 'pry'
   puts "running sim"
-  puts "VERSION: self defining hidden layer, variable len starter genes, mutate can remove gene, genome length in fitness test, red images, real images as input"
   fitness_checker = Brain::FitnessChecker::RedFinder.new
   Individual::VariableGeneLength = true
   Individual::GENOME_LENGTH = 200

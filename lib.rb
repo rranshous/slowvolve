@@ -1,7 +1,9 @@
 require_relative 'neural_net'
+require 'parallel'
+
+GENOME_LENGTH = 100
 
 class Individual
-  GENOME_LENGTH = 100
   VariableGeneLength = false
 
   def self.new_random genome_length: 100
@@ -66,23 +68,31 @@ class Community
   end
 
   def compute_fitnesses sim
-    sim.individuals
-      .select { |i| i.fitness.nil? }
-      .each { |i| i.fitness = compute_fitness(i) }
+    # TODO: pass fitness computer to individual, let it
+    #       set its own fitness
+    need_fitness = sim.individuals
+                      .select { |i| i.fitness.nil? }
+
+    # TODO: make parallel across procs
+    #Parallel.each(need_fitness, in_threads: 4) do |i|
+    need_fitness.each do |i|
+      i.fitness = compute_fitness(i)
+    end
   end
 
   def cull sim
-    to_kill = sim.individuals.size * 0.8
-    puts "killing: #{to_kill}"
+    to_kill = (sim.individuals.size * 0.8).to_i
     individuals_by_fitness(sim).reverse.take(to_kill)
       .each { |i| sim.remove_individual i }
   end
 
   def breed sim
     return if sim.individuals.length == 0
-    to_birth = (target_size - sim.individuals.length) * 0.8
+    puts "breeding"
+    to_birth = ((target_size - sim.individuals.length) * 0.8).to_i
     new_individuals = []
     while new_individuals.length < to_birth
+      puts "new individuals [#{new_individuals.length}/#{to_birth}]"
       new_individuals += top_pairs(sim).map { |i1, i2| i1 + i2 }
     end
     puts "birthed: #{new_individuals.length}"
@@ -96,7 +106,7 @@ class Community
   end
 
   def random_individual
-    Individual.new_random
+    Individual.new_random genome_length: GENOME_LENGTH
   end
 
   def compute_fitness individual
@@ -114,9 +124,14 @@ class Community
   private
 
   def top_pairs sim
-    sim.individuals
-      .sort_by(&:fitness)
-      .each_cons(2)
+    sorted = sim.individuals.sort_by(&:fitness)
+    if sorted.length >= 6
+      sorted.each_cons(2)
+    elsif sorted.length == 1
+      [[sorted.first, sorted.first]]
+    else
+      [sorted.reverse.take(2)]
+    end
   end
 end
 

@@ -1,3 +1,4 @@
+require 'thin'
 require 'sinatra'
 require 'json'
 require_relative '../brain'
