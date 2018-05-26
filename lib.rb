@@ -4,8 +4,8 @@ class Individual
   GENOME_LENGTH = 100
   VariableGeneLength = false
 
-  def self.new_random
-    new random_genome(GENOME_LENGTH)
+  def self.new_random genome_length: 100
+    new random_genome(genome_length)
   end
 
   def self.random_genome len

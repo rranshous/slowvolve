@@ -22,12 +22,10 @@ module Brain
       puts "found images: #{image_paths.size}"
       image_paths.each do |image_path|
         begin
-          #puts "loading: #{image_path}"
           reader = PixelReader.new(image_path: image_path)
           image = Image.new
           image.rgb = reader.rgb
           image.path = image_path
-          #puts "loaded rgbs: #{image.rgb.size}"
           print '.'
           @image_sets[type] << image
         rescue SignalException
@@ -36,6 +34,7 @@ module Brain
           puts "Ex: #{ex}"
         end
       end
+      puts
     end
 
     class Image
