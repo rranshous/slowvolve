@@ -7,12 +7,14 @@ module Brain::FitnessChecker
   class RedFinder
     # turn on when most the input fits a pattern
     # is the image mostly red ?
-    attr_accessor :factory
+    attr_accessor :factory, :image_collection
 
     def initialize
       input_size = image_size * 3
       self.factory = BrainFactory.new input_layer_size: input_size,
                                       output_layer_size: 2
+      self.image_collection = Brain::ImageCollection.new
+      load_images()
     end
 
     def best_possible? individual
@@ -27,7 +29,7 @@ module Brain::FitnessChecker
       score = 0
       brain = factory.create_from individual
       1000.times do
-        image_details = generate_random_image
+        image_details = get_random_image
         mostly_red, mostly_not_red = brain.run image_details.data
         mostly_red = mostly_red >= 0.5
         mostly_not_red = mostly_not_red >= 0.5
@@ -38,6 +40,14 @@ module Brain::FitnessChecker
       score += length_penalty(individual)
       puts "score: #{score}"
       score
+    end
+
+    def get_random_image
+      type = [:red, :random].sample
+      is_red = type == :red
+      image = image_collection.random(type: type)
+      image_data = image.rgb_flat(size: image_size)
+      OpenStruct.new({ data: image_data, is_red: is_red })
     end
 
     def generate_random_image
@@ -57,8 +67,18 @@ module Brain::FitnessChecker
       OpenStruct.new({ data: image_data, is_red: red_pixels >= 50 })
     end
 
+    def load_images
+      puts "pre loading images"
+      image_collection
+        .register(type: :red,
+                  path: './inputs/red-pics_thumbnail')
+      image_collection
+        .register(type: :random,
+                  path: './inputs/sample_thumbnail')
+    end
+
     def image_size
-      20
+      100
     end
   end
 end
@@ -67,7 +87,7 @@ end
 if __FILE__ == $0
   require 'pry'
   puts "running sim"
-  puts "VERSION: self defining hidden layer, variable len starter genes, mutate can remove gene, genome length in fitness test"
+  puts "VERSION: self defining hidden layer, variable len starter genes, mutate can remove gene, genome length in fitness test, red images"
   fitness_checker = Brain::FitnessChecker::RedFinder.new
   Individual::VariableGeneLength = true
   Individual::GENOME_LENGTH = 200

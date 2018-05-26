@@ -1,4 +1,7 @@
+require_relative 'image_collection'
+require_relative 'pixel_reader'
 module Brain
+
   module FitnessChecker
     class HighOrLow
       attr_accessor :factory
