@@ -10,7 +10,8 @@ module Brain::FitnessChecker
     attr_accessor :factory
 
     def initialize
-      self.factory = BrainFactory.new input_layer_size: 300,
+      input_size = image_size * 3
+      self.factory = BrainFactory.new input_layer_size: input_size,
                                       output_layer_size: 2
     end
 
@@ -43,8 +44,8 @@ module Brain::FitnessChecker
       # 10 by 10 pixel color image
       red_pixels = 0
       image_data = []
-      10.times do |i|
-        10.times do |j|
+      image_size.times do |i|
+        image_size.times do |j|
           3.times do |c|
             image_data << rand(0..255)
           end
@@ -54,6 +55,10 @@ module Brain::FitnessChecker
         end
       end
       OpenStruct.new({ data: image_data, is_red: red_pixels >= 50 })
+    end
+
+    def image_size
+      20
     end
   end
 end
