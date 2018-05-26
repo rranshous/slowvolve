@@ -34,9 +34,9 @@ module Brain
           raise
         rescue Exception => ex
           puts "Ex: #{ex}"
-          require 'pry';binding.pry
         end
       end
+      puts
     end
 
     class Image

@@ -12,7 +12,8 @@ module Brain
       File.open(image_path+'.txt', 'r')
         .readlines
         .drop(1)
-        .map { |l| l.match(/...,...,.../)[0] }
+        .map { |l| l.match(/\(.+?,.+?,.+?\)/)[0] }
+        .map { |s| s[1..-2] }
         .map { |rgbs| rgbs.split(',').map(&:strip) }
         .map { |rgb| rgb.map(&:to_i) }
     end

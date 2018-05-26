@@ -46,7 +46,7 @@ module Brain::FitnessChecker
       type = [:red, :random].sample
       is_red = type == :red
       image = image_collection.random(type: type)
-      image_data = image.rgb_flat(size: image_size)
+      image_data = image.rgb_flat
       OpenStruct.new({ data: image_data, is_red: is_red })
     end
 
@@ -87,7 +87,7 @@ end
 if __FILE__ == $0
   require 'pry'
   puts "running sim"
-  puts "VERSION: self defining hidden layer, variable len starter genes, mutate can remove gene, genome length in fitness test, red images"
+  puts "VERSION: self defining hidden layer, variable len starter genes, mutate can remove gene, genome length in fitness test, red images, real images as input"
   fitness_checker = Brain::FitnessChecker::RedFinder.new
   Individual::VariableGeneLength = true
   Individual::GENOME_LENGTH = 200
